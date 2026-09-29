@@ -3,7 +3,7 @@
      (a change is visible the second time the app is opened)
    - map tiles: every tile seen once is kept, so browse the visit area before leaving
    Change VERSION to force every phone to drop its old copy of the app files. */
-const VERSION = "96e7e69c55";
+const VERSION = "5037c3ef42";
 const SHELL = "piezovisit-shell-" + VERSION;
 const TILES = "piezovisit-tiles";
 const MAX_TILES = 6000;
