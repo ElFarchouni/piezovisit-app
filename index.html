@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#004275">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="PiezoVisit">
+<title>PiezoVisit</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
+<link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+<link rel="stylesheet" href="css/app.css">
+</head>
+<body class="locked" data-view="map">
+
+<!-- icon sprite (inline so the app works offline and from a single file) -->
+<svg xmlns="http://www.w3.org/2000/svg" style="display:none" aria-hidden="true">
+  <symbol id="i-map" viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Zm0 0v14m6-12v14" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><path d="M8 6h13M8 12h13M8 18h13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="3.5" cy="6" r="1.5" fill="currentColor"/><circle cx="3.5" cy="12" r="1.5" fill="currentColor"/><circle cx="3.5" cy="18" r="1.5" fill="currentColor"/></symbol>
+  <symbol id="i-route" viewBox="0 0 24 24"><circle cx="6" cy="19" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><circle cx="18" cy="5" r="2.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M8.5 19H15a3.5 3.5 0 0 0 0-7H9a3.5 3.5 0 0 1 0-7h6.5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-locate" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3.5" fill="currentColor"/><circle cx="12" cy="12" r="7.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 1.5v3M12 19.5v3M1.5 12h3M19.5 12h3" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-layers" viewBox="0 0 24 24"><path d="m12 3 9 5-9 5-9-5 9-5Zm-9 9.5 9 5 9-5M3 17l9 5 9-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-fit" viewBox="0 0 24 24"><path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-nav" viewBox="0 0 24 24"><path d="M21 3 3 10.5l7.5 3L13.5 21 21 3Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/></symbol>
+  <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12.5 4.5 4.5L19 7.5" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6 6 18" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></symbol>
+  <symbol id="i-edit" viewBox="0 0 24 24"><path d="M4 20h4L19.5 8.5a2.1 2.1 0 0 0-3-3L5 17l-1 3ZM14.5 7.5l3 3" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></symbol>
+  <symbol id="i-up" viewBox="0 0 24 24"><path d="m6 14 6-6 6 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-down" viewBox="0 0 24 24"><path d="m6 10 6 6 6-6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3m-8 0 1 13h8l1-13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 4v11m0 0-4.5-4.5M12 15l4.5-4.5M4 20h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></symbol>
+  <symbol id="i-sun" viewBox="0 0 24 24"><circle cx="12" cy="12" r="4" fill="none" stroke="currentColor" stroke-width="2"/><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="6.5" fill="none" stroke="currentColor" stroke-width="2"/><path d="m16 16 5 5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></symbol>
+  <symbol id="i-warn" viewBox="0 0 24 24"><path d="M12 3.5 2.5 20h19L12 3.5Z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M12 10v4.5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="17.2" r="1.1" fill="currentColor"/></symbol>
+  <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="12" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="2"/><path d="M16 8V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v8a2 2 0 0 0 2 2h2" fill="none" stroke="currentColor" stroke-width="2"/></symbol>
+</svg>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="icons/icon.svg" alt="" width="30" height="30">
+    <div>
+      <div class="brand-name">PiezoVisit</div>
+      <div class="brand-sub" id="netCount"></div>
+    </div>
+  </div>
+  <div class="topbar-actions">
+    <span class="net-state" id="netState" title=""><span class="dot"></span><span id="netStateTxt"></span></span>
+    <button class="icon-btn txt" id="btnLang" type="button" aria-label="Language">FR</button>
+    <button class="icon-btn" id="btnTheme" type="button" aria-label="Theme"><svg><use href="#i-sun"/></svg></button>
+  </div>
+</header>
+
+<nav class="nav" id="nav" aria-label="Main">
+  <button type="button" data-view="map" class="on"><svg><use href="#i-map"/></svg><span data-i18n="nav.map">Map</span></button>
+  <button type="button" data-view="list"><svg><use href="#i-list"/></svg><span data-i18n="nav.list">Piezometers</span></button>
+  <button type="button" data-view="visit"><svg><use href="#i-route"/></svg><span data-i18n="nav.visit">Visit</span><b class="nav-badge" id="visitBadge" hidden></b></button>
+</nav>
+
+<main id="main">
+  <!-- LIST -->
+  <section id="view-list" class="panel" aria-label="Piezometers">
+    <div class="panel-head">
+      <label class="search">
+        <svg><use href="#i-search"/></svg>
+        <input id="listSearch" type="search" inputmode="search" autocomplete="off" data-i18n-ph="list.search" placeholder="Search IRE, name, commune">
+      </label>
+      <div class="chips" id="listFilters">
+        <button type="button" class="chip on" data-filter="all" data-i18n="filter.all">All</button>
+        <button type="button" class="chip" data-filter="diver" data-i18n="filter.diver">Divers</button>
+        <button type="button" class="chip" data-filter="visit" data-i18n="filter.visit">In visit</button>
+        <button type="button" class="chip" data-filter="todo" data-i18n="filter.todo">To do</button>
+      </div>
+      <div class="list-meta"><span id="listCount"></span><span id="listSort"></span></div>
+    </div>
+    <div class="panel-body" id="piezoList"></div>
+  </section>
+
+  <!-- VISIT -->
+  <section id="view-visit" class="panel" aria-label="Visit">
+    <div class="panel-head">
+      <div class="row">
+        <select id="visitSelect" aria-label="Visit"></select>
+        <button type="button" class="btn ghost sq" id="btnNewVisit" aria-label="New visit"><svg><use href="#i-plus"/></svg></button>
+      </div>
+    </div>
+    <div class="panel-body" id="visitBody"></div>
+  </section>
+
+  <!-- MAP -->
+  <section id="view-map" aria-label="Map">
+    <div id="map"></div>
+    <div class="map-chips chips" id="mapFilters">
+      <button type="button" class="chip on" data-filter="all" data-i18n="filter.all">All</button>
+      <button type="button" class="chip" data-filter="diver" data-i18n="filter.diver">Divers</button>
+      <button type="button" class="chip" data-filter="visit" data-i18n="filter.visit">In visit</button>
+    </div>
+    <div class="map-fabs">
+      <button type="button" class="fab" id="btnLayers" aria-label="Background"><svg><use href="#i-layers"/></svg></button>
+      <button type="button" class="fab" id="btnFit" aria-label="Show all"><svg><use href="#i-fit"/></svg></button>
+      <button type="button" class="fab primary" id="btnLocate" aria-label="My position"><svg><use href="#i-locate"/></svg></button>
+    </div>
+    <div class="menu" id="layerMenu" hidden></div>
+    <div class="legend" id="legend"></div>
+  </section>
+</main>
+
+<!-- piezometer detail sheet -->
+<aside class="sheet" id="sheet" hidden aria-live="polite"></aside>
+
+<!-- field record form -->
+<dialog id="recordDlg" class="dlg">
+  <form id="recordForm" method="dialog" novalidate>
+    <header class="dlg-head">
+      <div>
+        <div class="caps" data-i18n="rec.title">Field record</div>
+        <div class="dlg-title" id="recTitle"></div>
+      </div>
+      <button type="button" class="icon-btn" id="recClose" aria-label="Close"><svg><use href="#i-close"/></svg></button>
+    </header>
+    <div class="dlg-body">
+      <div class="hint" id="recHint"></div>
+
+      <div class="grid2 stack">
+        <label class="field"><span data-i18n="rec.datetime">Date and time</span>
+          <input type="datetime-local" name="datetime" required></label>
+        <label class="field"><span data-i18n="rec.operator">Operator</span>
+          <input type="text" name="operator" autocomplete="name"></label>
+      </div>
+
+      <label class="field"><span data-i18n="rec.wellState">Well state</span>
+        <select name="wellState">
+          <option value="ok" data-i18n="ws.ok">Accessible, measured</option>
+          <option value="pumping" data-i18n="ws.pumping">Pumping during measure</option>
+          <option value="dry" data-i18n="ws.dry">Dry</option>
+          <option value="locked" data-i18n="ws.locked">Locked / no key</option>
+          <option value="blocked" data-i18n="ws.blocked">Obstructed</option>
+          <option value="notfound" data-i18n="ws.notfound">Not found</option>
+          <option value="destroyed" data-i18n="ws.destroyed">Destroyed</option>
+        </select></label>
+
+      <label class="field big"><span data-i18n="rec.dtw">Depth to water (m)</span>
+        <input type="text" name="dtw" inputmode="decimal" autocomplete="off" maxlength="7" placeholder="0.00"></label>
+      <div class="warn" id="recWarn" hidden></div>
+
+      <fieldset id="recDiver">
+        <legend data-i18n="rec.diver">Diver</legend>
+        <label class="check"><input type="checkbox" name="hasDiver"><span data-i18n="rec.hasDiver">A Diver is installed here</span></label>
+        <div id="recDiverFields">
+          <label class="field"><span data-i18n="rec.diverStatus">Diver status</span>
+            <select name="diverStatus">
+              <option value="recording" data-i18n="ds.recording">Recording</option>
+              <option value="restarted" data-i18n="ds.restarted">Restarted</option>
+              <option value="replaced" data-i18n="ds.replaced">Replaced</option>
+              <option value="removed" data-i18n="ds.removed">Removed</option>
+              <option value="dry" data-i18n="ds.dry">Out of water</option>
+              <option value="fault" data-i18n="ds.fault">Not working</option>
+              <option value="missing" data-i18n="ds.missing">Not found</option>
+            </select></label>
+          <label class="check"><input type="checkbox" name="downloaded"><span data-i18n="rec.downloaded">Data downloaded</span></label>
+          <div class="grid2">
+            <label class="field"><span data-i18n="rec.cableBefore">Cable before (m)</span>
+              <input type="text" name="cableBefore" inputmode="decimal" autocomplete="off" maxlength="7"></label>
+            <label class="field"><span data-i18n="rec.cableAfter">Cable after (m)</span>
+              <input type="text" name="cableAfter" inputmode="decimal" autocomplete="off" maxlength="7"></label>
+          </div>
+        </div>
+      </fieldset>
+
+      <label class="field"><span data-i18n="rec.comment">Comment</span>
+        <textarea name="comment" rows="3"></textarea></label>
+
+      <div class="gpsline" id="recGps"></div>
+    </div>
+    <footer class="dlg-foot">
+      <button type="button" class="btn ghost danger" id="recDelete" hidden><svg><use href="#i-trash"/></svg><span data-i18n="act.delete">Delete</span></button>
+      <span class="grow"></span>
+      <button type="button" class="btn ghost" id="recCancel" data-i18n="act.cancel">Cancel</button>
+      <button type="submit" class="btn primary"><svg><use href="#i-check"/></svg><span data-i18n="act.save">Save</span></button>
+    </footer>
+  </form>
+</dialog>
+
+<div class="toast" id="toast" hidden role="status"></div>
+
+<script src="vendor/leaflet/leaflet.js"></script>
+<script src="data/data.enc.js"></script>
+<script src="js/unlock.js"></script>
+</body>
+</html>
